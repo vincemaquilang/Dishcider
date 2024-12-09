@@ -1,1 +1,1 @@
-# Dishcider sample
+# Dishcider UI
