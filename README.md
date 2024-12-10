@@ -1,4 +1,4 @@
-# Running Dishcider Locally Using Python's HTTP Server
+# Running Dishcider Locally Using Python's HTTP Servers
 
 This guide explains how to set up and run the **Dishcider** template locally using Python's built-in HTTP server. This method is lightweight, easy to set up, and requires minimal installation.
 
