@@ -980,8 +980,9 @@ mobile menu button
 }
 
 .sb-info-btn {
-    margin-left: 10px;
-    width: 20px;
+    margin-left: 160px;
+    margin-bottom: 10px;
+    width: 75px;
     display: flex !important;
 }
 
@@ -1004,6 +1005,12 @@ mobile menu button
 @media (max-width: 992px) {
     .sb-menu-btn {
         display: flex;
+    }
+}
+
+@media (max-width: 992px) {
+    .sb-info-btn > img {
+        display: none;
     }
 }
 
@@ -1543,7 +1550,7 @@ top bar
 }
 
 .sb-top-bar-frame .sb-top-bar .sb-logo-frame img {
-    width: 100%;
+    width: 72%;
 }
 
 .sb-top-bar-frame .sb-top-bar .sb-logo-frame:hover {
@@ -1551,7 +1558,7 @@ top bar
 }
 
 .sb-top-bar-frame .sb-top-bar .sb-right-side {
-    width: 50%;
+    width: 70%;
     display: flex;
     justify-content: flex-end;
 }
