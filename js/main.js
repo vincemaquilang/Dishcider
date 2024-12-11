@@ -1,725 +1,436 @@
-/* -------------------------------------------
+/**
+ * RetinaLogo
+ * Contact Form
+ * Header Fixed
+ * alert box
+ */
 
-Name: 		dishcider
-Version:  1.0
-Author:		Nazar Miller (millerDigitalDesign)
-Portfolio:  https://themeforest.net/user/millerdigitaldesign/portfolio?ref=MillerDigitalDesign
+(function($) {
+    "use strict";
 
-p.s. I am available for Freelance hire (UI design, web development). mail: miller.themes@gmail.com
+    var themesflatTheme = {
+        // Main init function
+        init: function() {
+            this.config();
+            this.events();
+        },
 
-------------------------------------------- */
+        // Define vars for caching
+        config: function() {
+            this.config = {
+                $window: $(window),
+                $document: $(document),
+            };
+        },
 
-$(function() {
+        // Events
+        events: function() {
+            var self = this;
 
-  "use strict";
-  /***************************
+            // Run on document ready
+            self.config.$document.on("ready", function() {
+                // Retina Logos
+                self.retinaLogo();
+            });
 
-  preloader
+            // Run on Window Load
+            self.config.$window.on("load", function() {});
+        },
+    }; // end themesflatTheme
 
-  ***************************/
-  $(document).ready(function() {
-    $(".sb-loading").animate({
-      opacity: 1
-    }, {
-      duration: 500,
-    });
-    setTimeout(function() {
-      $('.sb-preloader-number').each(function() {
-        var $this = $(this),
-          countTo = $this.attr('data-count');
-        $({
-          countNum: $this.text()
-        }).animate({
-          countNum: countTo
-        }, {
-          duration: 1000,
-          easing: 'swing',
-          step: function() {
-            $this.text(Math.floor(this.countNum));
-          },
+    // Start things up
+    themesflatTheme.init();
+
+    /* RetinaLogo
+    ------------------------------------------------------------------------------------- */
+    var retinaLogos = function() {
+        var retina = window.devicePixelRatio > 1 ? true : false;
+        if (retina) {
+            $("#site-logo-inner").find("img").attr({
+                src: "assets/images/logo/logo@2x.png",
+                width: "197",
+                height: "48",
+            });
+
+            $("#logo-footer.style").find("img").attr({
+                src: "assets/images/logo/logo-footer@2x.png",
+                width: "197",
+                height: "48",
+            });
+            $("#logo-footer.style2").find("img").attr({
+                src: "assets/images/logo/logo@2x.png",
+                width: "197",
+                height: "48",
+            });
+        }
+    };
+
+    /* Contact Form
+    ------------------------------------------------------------------------------------- */
+    var ajaxContactForm = function() {
+        $("#contactform").each(function() {
+            $(this).validate({
+                submitHandler: function(form) {
+                    var $form = $(form),
+                        str = $form.serialize(),
+                        loading = $("<div />", { class: "loading" });
+
+                    $.ajax({
+                        type: "POST",
+                        url: $form.attr("action"),
+                        data: str,
+                        beforeSend: function() {
+                            $form.find(".send-wrap").append(loading);
+                        },
+                        success: function(msg) {
+                            var result, cls;
+                            if (msg === "Success") {
+                                result =
+                                    "Email Sent Successfully. Thank you, Your application is accepted - we will contact you shortly";
+                                cls = "msg-success";
+                            } else {
+                                result = "Error sending email.";
+                                cls = "msg-error";
+                            }
+                            $form.prepend(
+                                $("<div />", {
+                                    class: "flat-alert " + cls,
+                                    text: result,
+                                }).append(
+                                    $(
+                                        '<a class="close" href="#"><i class="icon icon-close2"></i></a>'
+                                    )
+                                )
+                            );
+
+                            $form.find(":input").not(".submit").val("");
+                        },
+                        complete: function(xhr, status, error_thrown) {
+                            $form.find(".loading").remove();
+                        },
+                    });
+                },
+            });
+        }); // each contactform
+    };
+    /* Header Fixed
+    ------------------------------------------------------------------------------------- */
+    var headerFixed = function() {
+        if ($("header").hasClass("header-fixed")) {
+
+            var nav = $("#header");
+            if (nav.length) {
+                var offsetTop = nav.offset().top,
+                    headerHeight = nav.height(),
+                    injectSpace = $("<div>", {
+                        height: headerHeight,
+                    });
+                injectSpace.hide();
+
+                $(window).on("load scroll", function() {
+                    if ($(window).scrollTop() > 0) {
+                        nav.addClass("is-fixed");
+                        injectSpace.show();
+                        $("#trans-logo").attr("src", "images/logo/logo@2x.png");
+                    } else {
+                        nav.removeClass("is-fixed");
+                        injectSpace.hide();
+                        $("#trans-logo").attr("src", "images/logo/logo@2x-white.png");
+                    }
+                });
+            }
+        }
+    };
+
+    $("#showlogo").prepend(
+        '<a href="index.html"><img id="theImg" src="assets/images/logo/logo2.png" /></a>'
+    );
+
+    //Submenu Dropdown Toggle
+    if ($(".main-header li.dropdown2 ul").length) {
+        $(".main-header li.dropdown2").append('<div class="dropdown2-btn"></div>');
+
+        //Dropdown Button
+        $(".main-header li.dropdown2 .dropdown2-btn").on("click", function() {
+            $(this).prev("ul").slideToggle(500);
         });
-      });
-      $(".sb-bar").animate({
-        height: '100%'
-      }, {
-        duration: 1000,
-        complete: function() {
 
-          $(".sb-preloader").addClass('sb-hidden')
+        //Disable dropdown parent link
+        $(".navigation li.dropdown2 > a").on("click", function(e) {
+            e.preventDefault();
+        });
+
+        //Disable dropdown parent link
+        $(
+            ".main-header .navigation li.dropdown2 > a,.hidden-bar .side-menu li.dropdown2 > a"
+        ).on("click", function(e) {
+            e.preventDefault();
+        });
+
+        $(".price-block .features .arrow").on("click", function(e) {
+            $(e.target.offsetParent.offsetParent.offsetParent).toggleClass(
+                "active-show-hidden"
+            );
+        });
+    }
+
+    // Mobile Nav Hide Show
+    if ($(".mobile-menu").length) {
+        //$('.mobile-menu .menu-box').mCustomScrollbar();
+
+        var mobileMenuContent = $(".main-header .nav-outer .main-menu").html();
+        $(".mobile-menu .menu-box .menu-outer").append(mobileMenuContent);
+        $(".sticky-header .main-menu").append(mobileMenuContent);
+
+        //Hide / Show Submenu
+        $(".mobile-menu .navigation > li.dropdown2 > .dropdown2-btn").on(
+            "click",
+            function(e) {
+                e.preventDefault();
+                var target = $(this).parent("li").children("ul");
+                var args = { duration: 300 };
+                if ($(target).is(":visible")) {
+                    $(this).parent("li").removeClass("open");
+                    $(target).slideUp(args);
+                    $(this)
+                        .parents(".navigation")
+                        .children("li.dropdown2")
+                        .removeClass("open");
+                    $(this)
+                        .parents(".navigation")
+                        .children("li.dropdown2 > ul")
+                        .slideUp(args);
+                    return false;
+                } else {
+                    $(this)
+                        .parents(".navigation")
+                        .children("li.dropdown2")
+                        .removeClass("open");
+                    $(this)
+                        .parents(".navigation")
+                        .children("li.dropdown2")
+                        .children("ul")
+                        .slideUp(args);
+                    $(this).parent("li").toggleClass("open");
+                    $(this).parent("li").children("ul").slideToggle(args);
+                }
+            }
+        );
+
+        //3rd Level Nav
+        $(
+            ".mobile-menu .navigation > li.dropdown2 > ul  > li.dropdown2 > .dropdown2-btn"
+        ).on("click", function(e) {
+            e.preventDefault();
+            var targetInner = $(this).parent("li").children("ul");
+
+            if ($(targetInner).is(":visible")) {
+                $(this).parent("li").removeClass("open");
+                $(targetInner).slideUp(500);
+                $(this)
+                    .parents(".navigation > ul")
+                    .find("li.dropdown2")
+                    .removeClass("open");
+                $(this)
+                    .parents(".navigation > ul")
+                    .find("li.dropdown > ul")
+                    .slideUp(500);
+                return false;
+            } else {
+                $(this)
+                    .parents(".navigation > ul")
+                    .find("li.dropdown2")
+                    .removeClass("open");
+                $(this)
+                    .parents(".navigation > ul")
+                    .find("li.dropdown2 > ul")
+                    .slideUp(500);
+                $(this).parent("li").toggleClass("open");
+                $(this).parent("li").children("ul").slideToggle(500);
+            }
+        });
+
+        //Menu Toggle Btn
+        $(".mobile-nav-toggler").on("click", function() {
+            $("body").addClass("mobile-menu-visible");
+        });
+
+        //Menu Toggle Btn
+        $(".mobile-menu .menu-backdrop, .close-btn").on("click", function() {
+            $("body").removeClass("mobile-menu-visible");
+            $(".mobile-menu .navigation > li").removeClass("open");
+            $(".mobile-menu .navigation li ul").slideUp(0);
+        });
+
+        $(document).keydown(function(e) {
+            if (e.keyCode === 27) {
+                $("body").removeClass("mobile-menu-visible");
+                $(".mobile-menu .navigation > li").removeClass("open");
+                $(".mobile-menu .navigation li ul").slideUp(0);
+            }
+        });
+    }
+
+    var ajaxSubscribe = {
+        obj: {
+            subscribeEmail: $("#subscribe-email"),
+            subscribeButton: $("#subscribe-button"),
+            subscribeMsg: $("#subscribe-msg"),
+            subscribeContent: $("#subscribe-content"),
+            dataMailchimp: $("#subscribe-form").attr("data-mailchimp"),
+            success_message: '<div class="notification_ok">Thank you for joining our mailing list! Please check your email for a confirmation link.</div>',
+            failure_message: '<div class="notification_error">Error! <strong>There was a problem processing your submission.</strong></div>',
+            noticeError: '<div class="notification_error">{msg}</div>',
+            noticeInfo: '<div class="notification_error">{msg}</div>',
+            basicAction: "mail/subscribe.php",
+            mailChimpAction: "mail/subscribe-mailchimp.php",
+        },
+
+        eventLoad: function() {
+            var objUse = ajaxSubscribe.obj;
+
+            $(objUse.subscribeButton).on("click", function() {
+                if (window.ajaxCalling) return;
+                var isMailchimp = objUse.dataMailchimp === "true";
+
+                if (isMailchimp) {
+                    ajaxSubscribe.ajaxCall(objUse.mailChimpAction);
+                } else {
+                    ajaxSubscribe.ajaxCall(objUse.basicAction);
+                }
+            });
+        },
+
+        ajaxCall: function(action) {
+            window.ajaxCalling = true;
+            var objUse = ajaxSubscribe.obj;
+            var messageDiv = objUse.subscribeMsg.html("").hide();
+            $.ajax({
+                url: action,
+                type: "POST",
+                dataType: "json",
+                data: {
+                    subscribeEmail: objUse.subscribeEmail.val(),
+                },
+                success: function(responseData, textStatus, jqXHR) {
+                    if (responseData.status) {
+                        objUse.subscribeContent.fadeOut(500, function() {
+                            messageDiv.html(objUse.success_message).fadeIn(500);
+                        });
+                    } else {
+                        switch (responseData.msg) {
+                            case "email-required":
+                                messageDiv.html(
+                                    objUse.noticeError.replace(
+                                        "{msg}",
+                                        "Error! <strong>Email is required.</strong>"
+                                    )
+                                );
+                                break;
+                            case "email-err":
+                                messageDiv.html(
+                                    objUse.noticeError.replace(
+                                        "{msg}",
+                                        "Error! <strong>Email invalid.</strong>"
+                                    )
+                                );
+                                break;
+                            case "duplicate":
+                                messageDiv.html(
+                                    objUse.noticeError.replace(
+                                        "{msg}",
+                                        "Error! <strong>Email is duplicate.</strong>"
+                                    )
+                                );
+                                break;
+                            case "filewrite":
+                                messageDiv.html(
+                                    objUse.noticeInfo.replace(
+                                        "{msg}",
+                                        "Error! <strong>Mail list file is open.</strong>"
+                                    )
+                                );
+                                break;
+                            case "undefined":
+                                messageDiv.html(
+                                    objUse.noticeInfo.replace(
+                                        "{msg}",
+                                        "Error! <strong>undefined error.</strong>"
+                                    )
+                                );
+                                break;
+                            case "api-error":
+                                objUse.subscribeContent.fadeOut(500, function() {
+                                    messageDiv.html(objUse.failure_message);
+                                });
+                        }
+                        messageDiv.fadeIn(500);
+                    }
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    alert("Connection error");
+                },
+                complete: function(data) {
+                    window.ajaxCalling = false;
+                },
+            });
+        },
+    };
+
+    /* alert box
+    ------------------------------------------------------------------------------------- */
+    var alertBox = function() {
+        $(document).on("click", ".close", function(e) {
+            $(this).closest(".flat-alert").remove();
+            e.preventDefault();
+        });
+    };
+
+
+    /* footer accordion
+  -------------------------------------------------------------------------*/
+    var handleFooter = function() {
+        var footerAccordion = function() {
+            var args = { duration: 250 };
+            $(".footer-heading-mobile").on("click", function() {
+                $(this).parent(".footer-col-block").toggleClass("open");
+                if (!$(this).parent(".footer-col-block").is(".open")) {
+                    $(this).next().slideUp(args);
+                } else {
+                    $(this).next().slideDown(args);
+                }
+            });
+        };
+
+        function handleAccordion() {
+            if (matchMedia("only screen and (max-width: 767px)").matches) {
+                if (!$(".footer-heading-mobile").data("accordion-initialized")) {
+                    footerAccordion();
+                    $(".footer-heading-mobile").data("accordion-initialized", true);
+                }
+            } else {
+                $(".footer-heading-mobile").off("click");
+                $(".footer-heading-mobile").parent(".footer-col-block").removeClass("open");
+                $(".footer-heading-mobile").next().removeAttr("style");
+                $(".footer-heading-mobile").data("accordion-initialized", false);
+            }
         }
-      });
-    }, 400);
-  });
-  /***************************
+        handleAccordion();
+        window.addEventListener("resize", function() {
+            handleAccordion();
+        });
+    };
 
-  faq
 
-  ***************************/
-  $('.sb-faq li .sb-question').on('click', function() {
-    $(this).find('.sb-plus-minus-toggle').toggleClass('sb-collapsed');
-    $(this).parent().toggleClass('sb-active');
-  });
-  /***************************
-
-  swup
-
-  ***************************/
-  const options = {
-    containers: ['#sb-dynamic-content', '#sb-dynamic-menu'],
-    animateHistoryBrowsing: true,
-    linkSelector: '.sb-navigation a:not([data-no-swup]) , a:not([data-no-swup])',
-  };
-  const swup = new Swup(options);
-  /***************************
-
-  isotope
-
-  ***************************/
-  $('.sb-filter a').on('click', function() {
-    $('.sb-filter .sb-active').removeClass('sb-active');
-    $(this).addClass('sb-active');
-
-    var selector = $(this).data('filter');
-    $('.sb-masonry-grid').isotope({
-      filter: selector
+    // Dom Ready
+    $(function() {
+        $(window).on("load resize", function() {
+            retinaLogos();
+        });
+        headerFixed();
+        ajaxContactForm();
+        ajaxSubscribe.eventLoad();
+        alertBox();
+        handleFooter();
     });
-    return false;
-  });
-  $(document).ready(function() {
-    $('.sb-masonry-grid').isotope({
-      itemSelector: '.sb-grid-item',
-      percentPosition: true,
-      masonry: {
-        columnWidth: '.sb-grid-sizer'
-      }
-    });
-  });
-  $('.sb-tabs').isotope({
-    filter: '.sb-ingredients-tab'
-  });
-  /***************************
-
-  fancybox
-
-  ***************************/
-  $('[data-fancybox="menu"]').fancybox({
-    animationEffect: "zoom-in-out",
-    animationDuration: 600,
-    transitionDuration: 1200,
-  });
-  $('[data-fancybox="gallery"]').fancybox({
-    animationEffect: "zoom-in-out",
-    animationDuration: 600,
-    transitionDuration: 1200,
-  });
-  $.fancybox.defaults.hash = false;
-  // /***************************
-
-  // discount popup
-
-  // ***************************/
-  // function showPopup() {
-  //   $('.sb-popup-frame').addClass('sb-active');
-  // }
-  // setTimeout(showPopup, 3000);
-  // $('.sb-close-popup , .sb-ppc').on('click', function() {
-  //   $('.sb-popup-frame').removeClass('sb-active');
-  // });
-  // /***************************
-
-  // click effect
-
-  // ***************************/
-  const cursor = document.querySelector('.sb-click-effect')
-  document.addEventListener('mousemove', (e) => {
-    cursor.setAttribute('style', "top:" + (e.pageY - 15) + "px; left:" + (e.pageX - 15) + "px;")
-  });
-  document.addEventListener('click', () => {
-    cursor.classList.add('sb-click')
-    setTimeout(() => {
-      cursor.classList.remove('sb-click')
-    }, 600)
-  });
-  /***************************
-
-  add to cart
-
-  ***************************/
-  var counter = $('.sb-cart-number').text();
-
-  $('.sb-atc').on('click', function() {
-    counter++;
-    $('.sb-cart-number').addClass('sb-added');
-    $(this).addClass('sb-added');
-    setTimeout(() => {
-      $('.sb-cart-number').removeClass('sb-added');
-    }, 600);
-    setTimeout(() => {
-      $('.sb-cart-number').text(counter);
-    }, 300);
-  });
-  /***************************
-
-  menu
-
-  ***************************/
-  $('.sb-menu-btn').on('click', function() {
-    $('.sb-menu-btn , .sb-navigation').toggleClass('sb-active');
-    $('.sb-info-btn , .sb-info-bar , .sb-minicart').removeClass('sb-active');
-  });
-  $('.sb-info-btn').on('click', function() {
-    $('.sb-info-btn , .sb-info-bar').toggleClass('sb-active');
-    $('.sb-menu-btn , .sb-navigation , .sb-minicart').removeClass('sb-active');
-  });
-  $('.sb-btn-cart').on('click', function() {
-    $('.sb-minicart').toggleClass('sb-active');
-    $('.sb-info-btn , .sb-info-bar , .sb-navigation , .sb-menu-btn , .sb-info-btn').removeClass('sb-active');
-  });
-  $(window).on("scroll", function() {
-    var scroll = $(window).scrollTop();
-    if (scroll >= 10) {
-      $('.sb-top-bar-frame').addClass('sb-scroll');
-    } else {
-      $('.sb-top-bar-frame').removeClass('sb-scroll');
-    }
-    if (scroll >= 10) {
-      $('.sb-info-bar , .sb-minicart').addClass('sb-scroll');
-    } else {
-      $('.sb-info-bar , .sb-minicart').removeClass('sb-scroll');
-    }
-  });
-  $(document).on('click', function(e) {
-    var el = '.sb-minicart , .sb-btn-cart , .sb-menu-btn , .sb-navigation , .sb-info-btn , .sb-info-bar';
-    if (jQuery(e.target).closest(el).length) return;
-    $('.sb-minicart , .sb-btn-cart , .sb-menu-btn , .sb-navigation , .sb-info-btn , .sb-info-bar').removeClass('sb-active');
-  });
-
-  if ($(window).width() < 992) {
-    $(".sb-has-children > a").attr("href", "#.")
-  }
-  $(window).resize(function() {
-    if ($(window).width() < 992) {
-      $(".sb-has-children > a").attr("href", "#.")
-    }
-  });
-  /***************************
-
-  quantity
-
-  ***************************/
-  $('.sb-add').on('click', function() {
-    if ($(this).prev().val() < 10) {
-      $(this).prev().val(+$(this).prev().val() + 1);
-    }
-  });
-  $('.sb-sub').on('click', function() {
-    if ($(this).next().val() > 1) {
-      if ($(this).next().val() > 1) $(this).next().val(+$(this).next().val() - 1);
-    }
-  });
-  /***************************
-
-  sticky
-
-  ***************************/
-  var sticky = new Sticky('.sb-sticky');
-  if ($(window).width() < 992) {
-    sticky.destroy();
-  }
-  /***************************
-
-  contact form
-
-  ***************************/
-  $("#form").submit(function() {
-    $.ajax({
-      type: "POST",
-      url: "mail.php",
-      data: $(this).serialize()
-    }).done(function() {
-      $('.sb-success-result').addClass('sb-active');
-    });
-    return false;
-  });
-  /***************************
-
-  sliders
-
-  ***************************/
-  var swiper = new Swiper('.sb-short-menu-slider-3i', {
-    slidesPerView: 3,
-    spaceBetween: 30,
-    parallax: true,
-    speed: 1000,
-    navigation: {
-      prevEl: '.sb-short-menu-prev',
-      nextEl: '.sb-short-menu-next',
-    },
-    breakpoints: {
-      992: {
-        slidesPerView: 2,
-      },
-      768: {
-        slidesPerView: 1,
-      },
-    },
-  });
-  var swiper = new Swiper('.sb-short-menu-slider-2-3i', {
-    slidesPerView: 3,
-    spaceBetween: 30,
-    parallax: true,
-    speed: 1000,
-    navigation: {
-      prevEl: '.sb-short-menu-prev-2',
-      nextEl: '.sb-short-menu-next-2',
-    },
-    breakpoints: {
-      992: {
-        slidesPerView: 2,
-      },
-      768: {
-        slidesPerView: 1,
-      },
-    },
-  });
-  var swiper = new Swiper('.sb-short-menu-slider-4i', {
-    slidesPerView: 4,
-    spaceBetween: 30,
-    parallax: true,
-    speed: 1000,
-    navigation: {
-      prevEl: '.sb-short-menu-prev',
-      nextEl: '.sb-short-menu-next',
-    },
-    breakpoints: {
-      992: {
-        slidesPerView: 2,
-      },
-      768: {
-        slidesPerView: 1,
-      },
-    },
-  });
-  var swiper = new Swiper('.sb-short-menu-slider-2-4i', {
-    slidesPerView: 4,
-    spaceBetween: 30,
-    parallax: true,
-    speed: 1000,
-    navigation: {
-      prevEl: '.sb-short-menu-prev-2',
-      nextEl: '.sb-short-menu-next-2',
-    },
-    breakpoints: {
-      992: {
-        slidesPerView: 2,
-      },
-      768: {
-        slidesPerView: 1,
-      },
-    },
-  });
-  var swiper = new Swiper('.sb-reviews-slider', {
-    slidesPerView: 2,
-    spaceBetween: 30,
-    parallax: true,
-    speed: 1000,
-    navigation: {
-      prevEl: '.sb-reviews-prev',
-      nextEl: '.sb-reviews-next',
-    },
-    breakpoints: {
-      992: {
-        slidesPerView: 2,
-      },
-      768: {
-        slidesPerView: 1,
-      },
-    },
-  });
-  var swiper = new Swiper('.sb-blog-slider-2i', {
-    slidesPerView: 2,
-    spaceBetween: 30,
-    parallax: true,
-    speed: 1000,
-    navigation: {
-      prevEl: '.sb-blog-prev',
-      nextEl: '.sb-blog-next',
-    },
-    breakpoints: {
-      992: {
-        slidesPerView: 2,
-      },
-      768: {
-        slidesPerView: 1,
-      },
-    },
-  });
-  var swiper = new Swiper('.sb-blog-slider-3i', {
-    slidesPerView: 3,
-    spaceBetween: 30,
-    parallax: true,
-    speed: 1000,
-    navigation: {
-      prevEl: '.sb-blog-prev',
-      nextEl: '.sb-blog-next',
-    },
-    breakpoints: {
-      992: {
-        slidesPerView: 2,
-      },
-      768: {
-        slidesPerView: 1,
-      },
-    },
-  });
-  /***************************
-
-  map
-
-  ***************************/
-  if ($("div").is("#map")) {
-    mapboxgl.accessToken = 'pk.eyJ1Ijoic3Rvc2NhciIsImEiOiJja2VpbDE4b2UwbDg3MnNwY2d3YzlvcDV5In0.e26tLedpKwxrkOmPkWhQlg';
-    var map = new mapboxgl.Map({
-      container: 'map',
-      style: 'mapbox://styles/stoscar/ckk6qpt2h0yi517o77x3tw34f',
-      center: [-79.394900, 43.643102],
-      zoom: 15
-    });
-    var marker = new mapboxgl.Marker()
-      .setLngLat([-79.394900, 43.643102])
-      .addTo(map);
-  }
-  $(".sb-lock").on('click', function() {
-    $('.sb-map').toggleClass('sb-active');
-    $('.sb-lock').toggleClass('sb-active');
-    $('.sb-lock .fas').toggleClass('fa-unlock');
-  });
-
-  /***************************
-
-  datepicker
-
-  ***************************/
-  $('.sb-datepicker').datepicker({
-    minDate: new Date(),
-  });
-
-  /*----------------------------------------------------------
-  ------------------------------------------------------------
-
-  REINIT
-
-  ------------------------------------------------------------
-  ----------------------------------------------------------*/
-  document.addEventListener("swup:contentReplaced", function() {
-    $('.sb-info-btn , .sb-info-bar , .sb-minicart , .sb-menu-btn , .sb-navigation').removeClass('sb-active');
-    $('.sb-top-bar-frame').removeClass('sb-scroll');
-    $('a').removeClass('sb-click');
-    if ($('html').hasClass('is-rendering')) {
-      $("html, body").animate({
-        scrollTop: 0
-      }, {
-        duration: 0,
-        complete: function() {}
-      });
-    }
-    /***************************
-
-    faq
-
-    ***************************/
-    $('.sb-faq li .sb-question').on('click', function() {
-      $(this).find('.sb-plus-minus-toggle').toggleClass('sb-collapsed');
-      $(this).parent().toggleClass('sb-active');
-    });
-    /***************************
-
-    isotope
-
-    ***************************/
-    $('.sb-filter a').on('click', function() {
-      $('.sb-filter .sb-active').removeClass('sb-active');
-      $(this).addClass('sb-active');
-
-      var selector = $(this).data('filter');
-      $('.sb-masonry-grid').isotope({
-        filter: selector
-      });
-      return false;
-    });
-    $(document).ready(function() {
-      $('.sb-masonry-grid').isotope({
-        itemSelector: '.sb-grid-item',
-        percentPosition: true,
-        masonry: {
-          columnWidth: '.sb-grid-sizer'
-        }
-      });
-    });
-    $('.sb-tabs').isotope({
-      filter: '.sb-ingredients-tab'
-    });
-    /***************************
-
-    fancybox
-
-    ***************************/
-    $('[data-fancybox="menu"]').fancybox({
-      animationEffect: "zoom-in-out",
-      animationDuration: 600,
-      transitionDuration: 1200,
-    });
-    $('[data-fancybox="gallery"]').fancybox({
-      animationEffect: "zoom-in-out",
-      animationDuration: 600,
-      transitionDuration: 1200,
-    });
-    $.fancybox.defaults.hash = false;
-    /***************************
-
-    click effect
-
-    ***************************/
-    $('a[href]:not([href^="mailto\\:"], [href$="\\#"], [href$="\\#."])').on('click', function() {
-      $(this).addClass('sb-click');
-    });
-    $('.sb-breadcrumbs a[href]:not([href^="mailto\\:"], [href$="\\#"], [href$="\\#."])').on('click', function() {
-      $('.sb-breadcrumbs').addClass('sb-click');
-    });
-    /***************************
-
-    add to cart
-
-    ***************************/
-    $('.sb-atc').on('click', function() {
-      counter++;
-      $('.sb-cart-number').addClass('sb-added');
-      $(this).addClass('sb-added');
-      setTimeout(() => {
-        $('.sb-cart-number').removeClass('sb-added');
-      }, 600);
-      setTimeout(() => {
-        $('.sb-cart-number').text(counter);
-      }, 300);
-    });
-    /***************************
-
-    menu
-
-    ***************************/
-    $(document).on('click', function(e) {
-      var el = '.sb-minicart , .sb-btn-cart , .sb-menu-btn , .sb-navigation , .sb-info-btn , .sb-info-bar';
-      if (jQuery(e.target).closest(el).length) return;
-      $('.sb-minicart , .sb-btn-cart , .sb-menu-btn , .sb-navigation , .sb-info-btn , .sb-info-bar').removeClass('sb-active');
-    });
-    if ($(window).width() < 992) {
-      $(".sb-has-children > a").attr("href", "#.")
-    }
-    $(window).resize(function() {
-      if ($(window).width() < 992) {
-        $(".sb-has-children > a").attr("href", "#.")
-      }
-    });
-    /***************************
-
-    quantity
-
-    ***************************/
-    $('.sb-add').on('click', function() {
-      if ($(this).prev().val() < 10) {
-        $(this).prev().val(+$(this).prev().val() + 1);
-      }
-    });
-    $('.sb-sub').on('click', function() {
-      if ($(this).next().val() > 1) {
-        if ($(this).next().val() > 1) $(this).next().val(+$(this).next().val() - 1);
-      }
-    });
-    /***************************
-
-    sticky
-
-    ***************************/
-    var sticky = new Sticky('.sb-sticky');
-    if ($(window).width() < 992) {
-      sticky.destroy();
-    }
-    /***************************
-
-    contact form
-
-    ***************************/
-    $("#form").submit(function() {
-      $.ajax({
-        type: "POST",
-        url: "mail.php",
-        data: $(this).serialize()
-      }).done(function() {
-        $('.sb-success-result').addClass('sb-active');
-      });
-      return false;
-    });
-    /***************************
-
-    sliders
-
-    ***************************/
-    var swiper = new Swiper('.sb-short-menu-slider-3i', {
-      slidesPerView: 3,
-      spaceBetween: 30,
-      parallax: true,
-      speed: 1000,
-      navigation: {
-        prevEl: '.sb-short-menu-prev',
-        nextEl: '.sb-short-menu-next',
-      },
-      breakpoints: {
-        992: {
-          slidesPerView: 2,
-        },
-        768: {
-          slidesPerView: 1,
-        },
-      },
-    });
-    var swiper = new Swiper('.sb-short-menu-slider-2-3i', {
-      slidesPerView: 3,
-      spaceBetween: 30,
-      parallax: true,
-      speed: 1000,
-      navigation: {
-        prevEl: '.sb-short-menu-prev-2',
-        nextEl: '.sb-short-menu-next-2',
-      },
-      breakpoints: {
-        992: {
-          slidesPerView: 2,
-        },
-        768: {
-          slidesPerView: 1,
-        },
-      },
-    });
-    var swiper = new Swiper('.sb-short-menu-slider-4i', {
-      slidesPerView: 4,
-      spaceBetween: 30,
-      parallax: true,
-      speed: 1000,
-      navigation: {
-        prevEl: '.sb-short-menu-prev',
-        nextEl: '.sb-short-menu-next',
-      },
-      breakpoints: {
-        992: {
-          slidesPerView: 2,
-        },
-        768: {
-          slidesPerView: 1,
-        },
-      },
-    });
-    var swiper = new Swiper('.sb-short-menu-slider-2-4i', {
-      slidesPerView: 4,
-      spaceBetween: 30,
-      parallax: true,
-      speed: 1000,
-      navigation: {
-        prevEl: '.sb-short-menu-prev-2',
-        nextEl: '.sb-short-menu-next-2',
-      },
-      breakpoints: {
-        992: {
-          slidesPerView: 2,
-        },
-        768: {
-          slidesPerView: 1,
-        },
-      },
-    });
-    var swiper = new Swiper('.sb-reviews-slider', {
-      slidesPerView: 2,
-      spaceBetween: 30,
-      parallax: true,
-      speed: 1000,
-      navigation: {
-        prevEl: '.sb-reviews-prev',
-        nextEl: '.sb-reviews-next',
-      },
-      breakpoints: {
-        992: {
-          slidesPerView: 2,
-        },
-        768: {
-          slidesPerView: 1,
-        },
-      },
-    });
-    var swiper = new Swiper('.sb-blog-slider-2i', {
-      slidesPerView: 2,
-      spaceBetween: 30,
-      parallax: true,
-      speed: 1000,
-      navigation: {
-        prevEl: '.sb-blog-prev',
-        nextEl: '.sb-blog-next',
-      },
-      breakpoints: {
-        992: {
-          slidesPerView: 2,
-        },
-        768: {
-          slidesPerView: 1,
-        },
-      },
-    });
-    var swiper = new Swiper('.sb-blog-slider-3i', {
-      slidesPerView: 3,
-      spaceBetween: 30,
-      parallax: true,
-      speed: 1000,
-      navigation: {
-        prevEl: '.sb-blog-prev',
-        nextEl: '.sb-blog-next',
-      },
-      breakpoints: {
-        992: {
-          slidesPerView: 2,
-        },
-        768: {
-          slidesPerView: 1,
-        },
-      },
-    });
-    /***************************
-
-    map
-
-    ***************************/
-    if ($("div").is("#map")) {
-      mapboxgl.accessToken = 'pk.eyJ1Ijoic3Rvc2NhciIsImEiOiJja2VpbDE4b2UwbDg3MnNwY2d3YzlvcDV5In0.e26tLedpKwxrkOmPkWhQlg';
-      var map = new mapboxgl.Map({
-        container: 'map',
-        style: 'mapbox://styles/stoscar/ckk6qpt2h0yi517o77x3tw34f',
-        center: [-79.394900, 43.643102],
-        zoom: 15
-      });
-      var marker = new mapboxgl.Marker()
-        .setLngLat([-79.394900, 43.643102])
-        .addTo(map);
-    }
-    $(".sb-lock").on('click', function() {
-      $('.sb-map').toggleClass('sb-active');
-      $('.sb-lock').toggleClass('sb-active');
-      $('.sb-lock .fas').toggleClass('fa-unlock');
-    });
-    /***************************
-
-    datepicker
-
-    ***************************/
-    $('.sb-datepicker').datepicker({
-      minDate: new Date(),
-    });
-  });
-
-});
+})(jQuery);
